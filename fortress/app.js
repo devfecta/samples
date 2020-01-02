@@ -1,5 +1,9 @@
 const http = require('http');
-const csv = require('csv-parser');
+const csv = require('csv');
+
+const csvJson = require('csvtojson')
+
+
 const bodyParser = require('body-parser');
 const fileSystem = require('fs');
 const express = require('express');
@@ -24,9 +28,30 @@ app.post('/result', (request, response) => {
 
         let readData = request.files.csvDocument.data.toString();
 
-        galaxies = readData.split('\r');
+        console.log(readData);
+
+
+        csv.parse(readData, {columns: true}, function(err, data) {
+
+            galaxies = JSON.parse(JSON.stringify(data, null, 2));
+
+            console.log(galaxies[0].title);
+
+            response.write(galaxies[0].title);
+            response.end();
+            
+        });
 
         console.log(galaxies);
+
+        /*
+        csvJson().fromStream(request.files.csvDocument.data)
+        .then((json) => {
+            console.log(json);
+        });
+        */
+        // galaxies = readData.split('\r');
+        // console.log(galaxies);
 
         // console.log(request.files.csvDocument.data.toString());
         
@@ -42,8 +67,8 @@ app.post('/result', (request, response) => {
     }
 
     
-    response.write('<h1>Hello World</h1>');
-    response.end();
+    //response.write('<h1>Hello World</h1>');
+    //response.end();
 });
 
 app.get('/', (request, response) => {

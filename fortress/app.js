@@ -1,22 +1,12 @@
-const http = require('http');
 const csv = require('csv');
-
-const csvJson = require('csvtojson')
-
-
-const bodyParser = require('body-parser');
 const fileSystem = require('fs');
 const express = require('express');
 const app = express();
 app.use(express.json());
-
 const fileUpload = require("express-fileupload");
 app.use(fileUpload());
 
-app.use(bodyParser.urlencoded({ extended: true })); 
-
 app.post('/result', (request, response) => {
-
 
     if(!request.files) {
         response.send("File was not found");
@@ -24,13 +14,17 @@ app.post('/result', (request, response) => {
     }
     else {
 
-        let galaxies = [];
-
+        //let galaxies = [];
+        /**
+         * Setting readData to a string of data from the CSV file.
+         * The trim method is used to remove additional white space because it caused problems
+         * with the JSON property names.
+         */
         let readData = request.files.csvDocument.data.toString().trim();
-
         // console.log(readData);
-
-
+        /**
+         * Parsing the readData in to JSON.
+         */
         csv.parse(readData, {columns: true}, function(err, data) {
             /*
             A = 1  B = 2  C = 3  D = 4  E = 5  F = 6  G = 7  H = 8
@@ -39,22 +33,28 @@ app.post('/result', (request, response) => {
             W = 23  X = 24  Y = 25  Z = 26
             */
 
-            galaxies = JSON.parse(JSON.stringify(data, null, 2));
-
+            let galaxies = JSON.parse(JSON.stringify(data, null, 2));
             // console.log(galaxies);
 
-            response.writeHead(200, {'Content-Type': 'text/html','Content-Length':galaxies.length});
-
+            response.writeHead(200, {'Content-Type': 'text/html'});
+            /**
+             * Mapping file names into an array of names that start with an odd numbered letter.
+             */
             let oddFileNames = galaxies
             .map((g) => {
+                /**
+                 * Converting the first letter of a name to the ascii number to check if it's and odd number.
+                 */
                 if (g.file_name.charCodeAt(0) % 2) {
                     // console.log(g.file_name.charCodeAt(0) + ' - ' + g.file_name.charAt(0));
                     return g.file_name;
                 }
             })
             .filter(name => name != undefined);
-            console.log(oddFileNames);
-
+            // console.log(oddFileNames);
+            /**
+             * Filtering the titles into an array to get rid of duplicates.
+             */
             let uniqueTitles = galaxies
             .map(galaxy => galaxy.title)
             .filter((name, index, galaxyNames) => 
@@ -64,8 +64,10 @@ app.post('/result', (request, response) => {
                     }
                 }
             );
-            console.log(uniqueTitles);
-
+            // console.log(uniqueTitles);
+            /**
+             * Mapping parent names and then adding related child names to the parent.
+             */
             let nestedGalaxies = galaxies
             .map(galaxy => { return {'id': galaxy.file_id, 'name': galaxy.file_name} })
             .map(parents => 
@@ -83,44 +85,46 @@ app.post('/result', (request, response) => {
                     return {'parent': parents.name, 'children': children};
                 }
             );
-            
+            // console.log(nestedGalaxies);
+            /**
+             * Creating a string of HTML to be sent to the browser via the response.
+             */
+            let html = '';
 
-            console.log(nestedGalaxies);
+            html += '<h3>Odd Numbered Names</h3>';
+            html += '<ul>';
+            oddFileNames.forEach(galaxy => {
+                html += `<li>${galaxy}</li>`;
+            });
+            html += '</ul>';
 
-            response.write('test');
+            html += '<h3>Unique Names</h3>';
+            html += '<ul>';
+            uniqueTitles.forEach(galaxy => {
+                html += `<li>${galaxy}</li>`;
+            });
+            html += '</ul>';
 
-            
+            html += '<h3>Nested Names</h3>';
+            html += '<ul>';
+            nestedGalaxies.forEach(parentGalaxy => {
+                html += `<li>${parentGalaxy.parent}</li>`;
+                if (parentGalaxy.children.length > 0) {
+                    html += '<ul>';
+                    parentGalaxy.children.forEach(childGalaxy => {
+                        html += `<li>${childGalaxy}</li>`;
+                    });
+                    html += '</ul>';
+                }
+            });
+            html += '</ul>';
+
+            response.write(html);
             response.end();
             
         });
 
-        //console.log(galaxies);
-
-        /*
-        csvJson().fromStream(request.files.csvDocument.data)
-        .then((json) => {
-            console.log(json);
-        });
-        */
-        // galaxies = readData.split('\r');
-        // console.log(galaxies);
-
-        // console.log(request.files.csvDocument.data.toString());
-        
-
-        //const readData = request.files.csvDocument.data.toString('utf-8');
-        /*
-        const readData = fileSystem.createReadStream(request.files.csvDocument.data).pipe(csv());
-        readData.on('data', function(rowData) {
-            galaxies = [...galaxies, rowData];
-        })
-        .on('end', () => { console.log(galaxies) });
-        */       
     }
-
-    
-    //response.write('<h1>Hello World</h1>');
-    //response.end();
 });
 
 app.get('/', (request, response) => {

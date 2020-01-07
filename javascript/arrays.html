@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Array Handling</title>
+</head>
+<body>
+    <h2>View Console</h2>
+    <script>
+        let characters = ['Luke Skywalker', 'Han Solo', 'Darth Vader', 'Princess Leia Solo'];
+
+        characters.forEach( character => console.log(character) );
+
+        // const mapArray = characters.map(character => character.concat('-') + Math.round(Math.random() * 100));
+        const mapArray = characters.map(character => { return {'name': character, 'movie': 'all'} });
+
+        console.log(mapArray);
+
+        const filterArray = characters.filter(character => { 
+           if (character.indexOf('Solo') >= 0) {
+               return character;
+           }
+        });
+
+        console.log(filterArray);
+
+        const reduceArray = characters.reduce((total, character) => { 
+            return total.toString().concat(character.concat(' - '));
+        }, '');
+
+        console.log(reduceArray);
+
+        const reduceRightArray = characters.reduceRight((total, character) => { 
+            return total.toString().concat(character.concat(' - '));
+        }, '');
+
+        console.log(reduceRightArray);
+
+        characters.sort();
+
+        console.log(characters);
+
+        characters.reverse();
+
+        console.log(characters);
+
+    </script>
+</body>
+</html>

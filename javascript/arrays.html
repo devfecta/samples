@@ -4,48 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Array Handling</title>
+    <title>Document</title>
 </head>
 <body>
     <h2>View Console</h2>
     <script>
-        let characters = ['Luke Skywalker', 'Han Solo', 'Darth Vader', 'Princess Leia Solo'];
 
-        characters.forEach( character => console.log(character) );
+        const getCharacters = async () => {
+            await fetch("https://swapi.co/api/people/", {
+                "method": "GET",
+                "headers": {
+                    "Content-Type": "text/json"
+                }
+            })
+            .then(response => response.json())
+            .then(json => {
+                const characters = json.results.map(character => character.name);
 
-        // const mapArray = characters.map(character => character.concat('-') + Math.round(Math.random() * 100));
-        const mapArray = characters.map(character => { return {'name': character, 'movie': 'all'} });
+                console.log(characters);
 
-        console.log(mapArray);
+                characters.forEach( character => console.log(character) );
 
-        const filterArray = characters.filter(character => { 
-           if (character.indexOf('Solo') >= 0) {
-               return character;
-           }
-        });
+                const mapArray = characters.map(character => { return {'name': character, 'movie': 'all'} });
 
-        console.log(filterArray);
+                console.log(mapArray);
 
-        const reduceArray = characters.reduce((total, character) => { 
-            return total.toString().concat(character.concat(' - '));
-        }, '');
+                const filterArray = characters.filter(character => { 
+                    return character.match(/er/i);
+                });
 
-        console.log(reduceArray);
+                console.log(filterArray);
 
-        const reduceRightArray = characters.reduceRight((total, character) => { 
-            return total.toString().concat(character.concat(' - '));
-        }, '');
+                const reduceArray = characters.reduce((total, character) => { 
+                    return total.toString().concat(character.concat(' - '));
+                }, '');
 
-        console.log(reduceRightArray);
+                console.log(reduceArray);
 
-        characters.sort();
+                const reduceRightArray = characters.reduceRight((total, character) => { 
+                    return total.toString().concat(character.concat(' = '));
+                }, '');
 
-        console.log(characters);
+                console.log(reduceRightArray);
 
-        characters.reverse();
+                characters.sort();
 
-        console.log(characters);
+                console.log(characters);
 
+                characters.reverse();
+
+                console.log(characters);
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+        
+        getCharacters();
+        
     </script>
 </body>
 </html>

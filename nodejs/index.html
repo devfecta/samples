@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-</head>
-<body>
-    <h2>View Console</h2>
+
     <script>
 
         const getCharacters = async () => {
-            await fetch("https://swapi.co/api/people/", {
+            await fetch("/json", {
                 "method": "GET",
                 "headers": {
                     "Content-Type": "application/json"
@@ -19,7 +17,8 @@
             })
             .then(response => response.json())
             .then(json => {
-                const characters = json.results.map(character => character.name);
+
+                const characters = json.map(character => character.name);
 
                 console.log(characters);
 
@@ -60,9 +59,17 @@
                 console.error(error);
             });
         }
-        
+
         getCharacters();
-        
+    
     </script>
+</head>
+<body>
+    <h2>View Console</h2>
+
+    <form action="/" method="post">
+        <input type="text" name="characterName" id="characterNameId" placeholder="Character Name" />
+        <button type="button">Add Character</button>
+    </form>
 </body>
 </html>

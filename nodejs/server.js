@@ -2,6 +2,10 @@ const http = require('http');
 const https = require('https');
 const fileSystem = require('fs');
 
+/**
+ * When the server start it will get data from swapi and create a JSON file
+ * containing the returned data, then reads the file to put the data into an array.
+ */
 https.get("https://swapi.co/api/people/", response => {
 
     let swData = '';
@@ -36,37 +40,6 @@ const getCharacters = (data) => {
     characters = data;
 }
 
-/*
-const getCharacters = async () => {
-    await fetch("https://swapi.co/api/people/", {
-        "method": "GET",
-        "headers": {
-            "Content-Type": "text/json"
-        }
-    })
-    .then(response => response.json())
-    .then(json => {
-
-        const characters = json.results.map(character => character.name);
-
-        fileSystem.writeFile('sw.json', characters, (error) => {
-
-            if(error) {
-                throw error;
-            }
-        
-            console.log('File Created');
-        
-        });
-
-
-    })
-    .catch(error => {
-        console.error(error);
-    });
-}
-*/
-
 const server = http.createServer((request, response) => {
 /*
     setTimeout(function() {
@@ -75,22 +48,46 @@ const server = http.createServer((request, response) => {
         console.log(`${delay}ms have passed since I was scheduled`);
       }, 2000);
 */
-    let responseCode = response.statusCode;
-
-    if (responseCode === 200) {
-
-        response.setHeader('Content-Type', 'text/plain');
-
-        characters.forEach(character => {
-            console.log(character.name);
-        });
-
-        //console.log(characters);
-
-        //response.setHeader('Cache-Control', 'max-age=10, must-revalidate=20');
-        
-        response.end(JSON.stringify(response.getHeaders()));
-        
+    switch(request.url) {
+        case '/json':
+            switch(request.method) {
+                case 'POST':
+                    break;
+                case 'PUT':
+                    break;
+                case 'DELETE':
+                    break;
+                default:
+                    // Endpoint to GET characters.
+                    //console.log(request.method);
+                    response.writeHead(200, {"Content-Type": "application/json"});
+                    response.end(JSON.stringify(characters));
+                    break;
+            }
+            break;
+        default:
+            /*
+            response.write("<!DOCTYPE \"html\">");
+            response.write("<html>");
+            response.write("<head>");
+            response.write("<title>Node.js Sample</title>");
+            response.write("</head>");
+            response.write("<body>");
+            response.write("<ul>");
+            characters.forEach(character => {
+                //console.log(character.name);
+                response.write("<li>" + character.name + "</li>");
+            });
+            response.write("</ul>");
+            response.write("</body>");
+            response.write("</html>");
+            */
+           fileSystem.readFile('index.html', (error, page) => {
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write(page.toString());
+                response.end();
+            });
+            break;
     }
 
 });

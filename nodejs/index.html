@@ -61,6 +61,8 @@
         }
 
         getCharacters();
+
+        
     
     </script>
 </head>
@@ -68,8 +70,18 @@
     <h2>View Console</h2>
 
     <form action="/" method="post">
-        <input type="text" name="characterName" id="characterNameId" placeholder="Character Name" />
-        <button type="button">Add Character</button>
+        <input type="text" name="characterName" id="characterName" placeholder="Character Name" />
+        <button type="button" id="addCharacterButton">Add Character</button>
     </form>
+
+    <script>
+        const addCharacter = function() {
+            const character = document.querySelector('#characterName');
+            console.log(character.value);
+        }
+
+        let addCharacterBtn = document.querySelector('#addCharacterButton');
+        addCharacterBtn.addEventListener('click', addCharacter);
+    </script>
 </body>
 </html>

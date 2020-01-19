@@ -6,13 +6,13 @@ const fileSystem = require('fs');
  * When the server start it will get data from swapi and create a JSON file
  * containing the returned data, then reads the file to put the data into an array.
  */
-https.get("https://swapi.co/api/people/", response => {
+https.get("https://swapi.co/api/people/", async response => {
 
     let swData = '';
     
     response.setEncoding("utf8");
 
-    response.on('data', data => {
+    await response.on('data', data => {
         swData += data.toString();
     })
     .on('end', () => {
